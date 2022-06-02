@@ -88,41 +88,6 @@ def DBShowUserAllBoard(creator: int):
     finally:
 
         connection.close()
-    
-    connection, cursor = ConnectToDatabase()
-    sql = f"SELECT id, creator, tag, name, row_size, column_size, description, privacy, icon, is_label_enable, created_time \
-            FROM boards \
-            WHERE name LIKE '%{connection.escape_string(name)}%'AND privacy= 'public'"
-
-    try:
-
-        cursor.execute(sql)
-    
-    except mariadb.Error as e:
-
-        print(e)
-        raise HTTPException(status_code = 500)
-    
-    else:
-        
-        for (id, creator, tag, name, row_size, column_size, description, privacy, icon, is_label_enable, created_time) in cursor:
-
-            board = {"id": id,
-                    "creator": creator,
-                    "tag": tag,
-                    "name": name,
-                    "row_size": row_size,
-                    "column_size": column_size,
-                    "description": description,
-                    "privacy": privacy,
-                    "icon": icon,
-                    "is_label_enable": is_label_enable,
-                    "created_time": created_time}
-            boards.append(board)
-
-    finally:
-
-        connection.close()
 
     return boards
 
@@ -495,12 +460,12 @@ def DBDeleteBoard(board_id: int):
 
 
 if __name__ == "__main__":
-    # print(DBUserSearchALLBoard(creator= 1,name= "")) #搜尋該使用者所有有權限看到的 images
-    # print(DBShowUserAllBoard(creator= 1)) #顯示該使用者所有有權限看到的 images
-    # print(DBShowAllUserCreateBoard(creator= 8))  #顯示該使用者創立的 images
-    # print(DBSearchUserCreateBoard(creator=1 ,name= "keyboard")) #搜尋該使用者創立的 image
-    # print(DBShowAllPublicBoard()) #顯示 public 的 images
-    # print(DBSearchPublicBoard(name="o")) #搜尋 public 的 image
+    # print(DBUserSearchALLBoard(creator= 1,name= "")) #搜尋該使用者所有有權限看到的 boards
+    print(DBShowUserAllBoard(creator= 2)) #顯示該使用者所有有權限看到的 boards
+    # print(DBShowAllUserCreateBoard(creator= 8))  #顯示該使用者創立的 boards
+    # print(DBSearchUserCreateBoard(creator=1 ,name= "keyboard")) #搜尋該使用者創立的 board
+    # print(DBShowAllPublicBoard()) #顯示 public 的 boards
+    # print(DBSearchPublicBoard(name="o")) #搜尋 public 的 board
     # print(DBCreateBoard(creator= 1,tag = "NULL",name= "bannfatr",row_size= 2,column_size= 2,description= "for test",privacy= "private",icon = 2,is_label_enable= 1)) #新增board
     # print(DBEditBoard(board_id= 178,tag ="NULL",name= "b",row_size= 2,column_size= 2,description= "for test1",privacy= "private",icon= 2,is_label_enable= 1)) #編輯board
     # DBDeleteBoard(board_id= 183) #刪除board
