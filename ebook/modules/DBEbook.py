@@ -447,7 +447,7 @@ if __name__ == "__main__":
     #print(DBSearchUserCreateEbook(creator=1 ,title= "b")) #搜尋該使用者創立的 ebook success
     #print(DBShowAllPublicEbook()) #顯示 public 的 ebooks success
     #print(DBSearchPublicEbook(title="o")) #搜尋 public 的 ebook
-    #DBCreateEbook(creator= 1,tag = "NULL",title= "bannfatr",page_num= 2,description= "for test",privacy= "private") #新增ebook success
+    #DBCreateEbook(creator= 8,tag = "NULL",title= "front_test4",page_num= 2,description= "for test",privacy= "public") #新增ebook success
     #DBEditEbook(ebook_id= 1,tag ="NULL",title= "b",page_num= 2,description= "modify for test1",privacy= "public")#編輯ebook success
     #DBDeleteEbook(ebook_id= 1) #刪除ebook success
     #print(DBUseIdGetEbook(ebook_id= 2)) #用id找ebook success
