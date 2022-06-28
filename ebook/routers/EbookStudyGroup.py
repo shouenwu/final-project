@@ -7,7 +7,6 @@ from typing import Optional
 
 
 from modules.CreateToken import CreateToken
-
 from authentications.AuthUserMustBeTeacher import AuthUserMustBeTeacher
 from authentications.AuthEditEbookPermission import AuthEditEbookPermission
 
@@ -20,25 +19,31 @@ router = APIRouter(
 )
 
 
-
 @router.get("/{ebook_id}")
-async def GetEbookStudyGroup(ebook_id: int,
+async def ShowAllStudentsInGroup(ebook_id: int,
                         user: dict = Depends(AuthUserMustBeTeacher)):
     
     await AuthEditEbookPermission(ebook_id,
                                   user)
                        
-    ebook_study_groups = DBEbookStudyGroup.DBGetEbookStudyGroupbyEbookID(ebook_id = ebook_id)
+    ebook_study_groups = DBEbookStudyGroup.DBShowAllStudentsInEbookStudyGroup(ebook_id = ebook_id,
+                                                                              teacher_id =user['id'])
     
-    for study_group in ebook_study_groups:
+    token = CreateToken(user)
+    return {"state": "success",
+            "access_token": token,
+            "token_type": "bearer",
+            "ebook_study_groups": ebook_study_groups}
 
-        teacher = DBUser.DBGetUser(user_id = study_group['teacher']['id'])
-        del teacher['password']
-        study_group['teacher'].update(teacher)
-
-        student = DBUser.DBGetUser(user_id = study_group['student']['id'])
-        del student['password']
-        study_group['student'].update(student)
+@router.get("/{ebook_id}/users")
+async def ShowAllUsersNotInGroup(ebook_id: int,
+                        user: dict = Depends(AuthUserMustBeTeacher)):
+    
+    await AuthEditEbookPermission(ebook_id,
+                                  user)
+                       
+    ebook_study_groups = DBEbookStudyGroup.DBShowAllStudentsNotInEbookStudyGroup(ebook_id = ebook_id,
+                                                                              teacher_id =user['id'])
 
     token = CreateToken(user)
     return {"state": "success",
@@ -53,14 +58,8 @@ async def PostEbookStudyGroup(ebook_id: int,
 
     await AuthEditEbookPermission(ebook_id,
                                   user)
-
-    data_id = DBEbookStudyGroup.DBCheckStudyGroup(ebook_id = ebook_id,
-                                                 teacher_id = user['id'],
-                                                 student_id = student_id)
-    
-    if (data_id == None):
             
-        DBEbookStudyGroup.DBCreateStudyGroup(ebook_id = ebook_id,
+    DBEbookStudyGroup.DBCreateEbookStudyGroup(ebook_id = ebook_id,
                                             teacher_id = user['id'],
                                             student_id = student_id)
     
@@ -70,47 +69,14 @@ async def PostEbookStudyGroup(ebook_id: int,
             "access_token": token,
             "token_type": "bearer"}
 
-@router.get("/{ebook_id}/users/search")
-async def GetSearchEbookStudyGroupSingleUser(ebook_id: int,
-                                        account: str,
-                                        user: dict = Depends(AuthUserMustBeTeacher)):
-    
-    await AuthEditEbookPermission(id = ebook_id, 
-                                  user = user)
-    
-    users = DBUser.DBSearchUser(account = account)
-
-    token = CreateToken(user)
-
-    return {"state": "success",
-            "access_token": token,
-            "token_type": "bearer",
-            "users": users}
-
-@router.get("/{ebook_id}/users/{student_id}")
-async def GetEbookStudyGroupSingleUser(ebook_id: int,
-                                  student_id: int,
-                                  user: dict = Depends(AuthUserMustBeTeacher)):
-
-    await AuthEditEbookPermission(ebook_id, user)
-
-    student = DBUser.DBGetUser(user_id = student_id)
-    del student['password']
-    
-    token = CreateToken(user)
-    return {"state": "success",
-            "access_token": token,
-            "token_type": "bearer",
-            "user": student}
-
 @router.delete("/{ebook_id}/users/{student_id}")
-async def DeleteStudyGroupSingleUser(ebook_id: int,
+async def DeleteEbookStudyGroupSingleUser(ebook_id: int,
                                      student_id: int,
                                      user: dict = Depends(AuthUserMustBeTeacher)):
 
     await AuthEditEbookPermission(ebook_id, user)                                     
 
-    DBEbookStudyGroup.DBDeleteStudyGroup(ebook_id = ebook_id,
+    DBEbookStudyGroup.DBDeleteEbookStudyGroupbyAllInfo(ebook_id = ebook_id,
                                         student_id = student_id,
                                         teacher_id = user['id'])
         
